@@ -1,3 +1,4 @@
 ---
 layout: home
+markdownStyles: false
 ---

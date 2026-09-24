@@ -1,48 +1,44 @@
 <script setup>
-// ========= 个人信息配置（在这里修改你的信息） =========
-const profile = {
-  // 头像图片：把图片放到 docs/public/avatar.jpg 即可自动使用
-  avatar: '/blogtouxiang.png',
-  signature: '一任阶前，点滴到天明',
-  email: 'panyulin002@gmail.com',
-  bilibili: {
-    name: 'B 站',
-    url: 'https://space.bilibili.com/90523078?spm_id_from=333.1007.0.0'
-  },
-  github: {
-    name: 'GitHub',
-    url: 'https://github.com/panyulin002-collab'
-  }
-}
+import { withBase } from 'vitepress'
+import { data as posts } from '../../posts.data'
+import { site } from '../../site'
 
-// Hero 背景图：默认使用内置渐变 SVG
-// 把自己的图片放到 docs/public/hero-bg.jpg 后改为 '/hero-bg.jpg' 即可
-const heroBg = '/blog.png'
+const profile = site.profile
+const hero = site.hero
+const postCount = posts.length
 
-// 头像加载失败时的占位 SVG（无需改动）
+// 浏览器按屏幕宽度在两张图之间挑选，手机端不会下载大图
+const heroSrcset = `${withBase(hero.imageSmall)} 1200w, ${withBase(hero.image)} 2400w`
+const heroFallback = withBase('/hero-bg.svg')
+
+// 头像加载失败时的占位 SVG
 const placeholderAvatar =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs><rect width="160" height="160" fill="url(#g)"/><circle cx="80" cy="64" r="30" fill="#fff" opacity="0.9"/><path d="M28 150c0-30 24-48 52-48s52 18 52 48" fill="#fff" opacity="0.9"/></svg>'
   )
-function onAvatarError(e) {
-  e.target.src = placeholderAvatar
-}
 
-// 示例文章列表（可自行扩展或改为从其他地方读取）
-const posts = [
-  { title: 'Hello World', date: '2026-09-18', desc: '欢迎来到我的博客，这是第一篇文章。', link: '/posts/hello-world' },
-]
+function onAvatarError(event) {
+  event.target.src = placeholderAvatar
+}
 </script>
 
 <template>
   <!-- Hero 全屏背景区：上实下虚 -->
-  <section
-    class="hero-banner"
-    :style="{ backgroundImage: `url(${heroBg})` }"
-  >
+  <section class="hero-banner" :style="{ backgroundImage: `url(${heroFallback})` }">
+    <img
+      class="hero-img"
+      :src="withBase(hero.image)"
+      :srcset="heroSrcset"
+      sizes="100vw"
+      alt=""
+      decoding="async"
+      fetchpriority="high"
+    />
     <div class="hero-overlay"></div>
     <div class="hero-inner">
+      <h1 class="hero-title">{{ site.name }}</h1>
+      <p class="hero-subtitle">{{ profile.signature }}</p>
     </div>
   </section>
 
@@ -53,8 +49,11 @@ const posts = [
       <div class="avatar-wrap">
         <img
           class="avatar"
-          :src="profile.avatar"
+          :src="withBase(profile.avatar)"
           :alt="profile.signature"
+          width="120"
+          height="120"
+          loading="lazy"
           @error="onAvatarError"
         />
       </div>
@@ -83,39 +82,26 @@ const posts = [
 
     <!-- 主内容区：文章列表 -->
     <main class="content">
-      <h2 class="content-title">最新文章</h2>
-      <ul class="post-list">
-        <li v-for="post in posts" :key="post.link" class="post-item">
-          <a :href="post.link" class="post-link">
-            <span class="post-title">{{ post.title }}</span>
-            <span class="post-date">{{ post.date }}</span>
-          </a>
-          <p class="post-desc">{{ post.desc }}</p>
-        </li>
-      </ul>
+      <div class="content-head">
+        <h2 class="content-title">最新文章</h2>
+        <a class="content-more" :href="withBase('/posts/')">
+          全部 {{ postCount }} 篇 →
+        </a>
+      </div>
+      <PostList :limit="5" />
     </main>
   </div>
 </template>
-
-<!-- 全局样式：确保 VitePress 容器不裁剪全宽 banner -->
-<style>
-/* 首页需要突破容器限制，让 hero 背景全屏铺满 */
-.VPHome {
-  overflow: visible !important;
-}
-</style>
 
 <style scoped>
 /* ===== Hero 全屏背景区：横跨整个视口，上实下虚 ===== */
 .hero-banner {
   position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  width: 100%;
   height: 420px;
   background-size: cover;
   background-position: center;
-  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #764ba2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,6 +109,15 @@ const posts = [
   /* 上实下虚：底部渐变到透明，与下方内容平滑过渡 */
   -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
 }
 
 .hero-overlay {
@@ -153,6 +148,7 @@ const posts = [
 .hero-subtitle {
   margin: 12px 0 0;
   font-size: 18px;
+  font-weight: 400;
   opacity: 0.92;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
@@ -249,56 +245,30 @@ const posts = [
 }
 
 .content-title {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 22px;
   font-weight: 600;
+}
+
+.content-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--vp-c-divider);
 }
 
-.post-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.post-item {
-  padding: 16px 20px;
-  margin-bottom: 12px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-
-.post-item:hover {
-  border-color: var(--vp-c-brand);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  transform: translateY(-2px);
-}
-
-.post-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-decoration: none;
-  color: var(--vp-c-text-1);
-}
-
-.post-title {
-  font-size: 17px;
-  font-weight: 600;
-}
-
-.post-date {
-  font-size: 13px;
-  color: var(--vp-c-text-3);
-}
-
-.post-desc {
-  margin: 8px 0 0;
+.content-more {
+  flex-shrink: 0;
   font-size: 14px;
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.content-more:hover {
+  text-decoration: underline;
 }
 
 /* 响应式：窄屏退化为单列 */

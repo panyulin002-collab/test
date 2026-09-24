@@ -1,6 +1,8 @@
 ---
 title: Hello World
 date: 2026-09-18
+description: 博客的第一篇文章，记录建站初衷与这里会写些什么。
+tags: [随笔, 博客]
 ---
 
 # Hello World
