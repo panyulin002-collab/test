@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      // 先定主题再渲染，避免亮暗切换闪一下
+      ;(function () {
+        try {
+          var saved = localStorage.getItem('blog-theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.dataset.theme = saved || (prefersDark ? 'dark' : 'light')
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+    <!--meta:start-->
+    <title>我的博客</title>
+    <!--meta:end-->
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

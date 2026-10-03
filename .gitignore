@@ -1,6 +1,14 @@
-node_modules
-docs/.vitepress/dist
-docs/.vitepress/cache
-.originals
-*.log
-.DS_Store
+node_modules/
+
+# 运行时数据：数据库与用户上传的图片视频，不进仓库
+data/
+
+# 前端构建产物
+web/dist/
+
+# 旧版 VitePress 站的构建缓存
+legacy-vitepress/dist/
+legacy-vitepress/cache/
+
+# 图片原图备份
+.originals/

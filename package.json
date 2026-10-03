@@ -1,15 +1,31 @@
 {
-  "name": "my-blog",
-  "version": "1.0.0",
-  "description": "个人静态博客",
+  "name": "blog-platform",
+  "version": "2.0.0",
+  "private": true,
   "type": "module",
+  "description": "多用户博客平台：账号登录、个人主页、在线写作用图片/视频",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "dev": "node scripts/dev.mjs",
+    "dev:server": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "dev:web": "vite --config web/vite.config.js",
+    "build": "vite build --config web/vite.config.js",
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "seed": "node --disable-warning=ExperimentalWarning server/seed.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.4.0"
   },
   "devDependencies": {
-    "vitepress": "^1.5.0",
-    "vue": "^3.5.13"
+    "@vitejs/plugin-vue": "^6.0.9",
+    "dompurify": "^3.4.16",
+    "highlight.js": "^11.12.0",
+    "marked": "^18.0.14",
+    "vite": "^8.3.1",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
   }
 }

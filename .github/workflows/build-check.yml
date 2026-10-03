@@ -1,0 +1,30 @@
+name: 构建检查
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建前端
+        run: npm run build
+
+      - name: 后端能否正常启动（顺便验证数据库建表）
+        run: |
+          DATA_DIR="$RUNNER_TEMP/blog-data" PORT=3999 node server/index.js &
+          sleep 3
+          curl -sf http://127.0.0.1:3999/api/site
